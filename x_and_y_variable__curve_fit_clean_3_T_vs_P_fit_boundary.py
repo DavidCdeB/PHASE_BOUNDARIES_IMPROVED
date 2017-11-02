@@ -11,17 +11,16 @@ from matplotlib import cm
 from sympy.solvers import solve
 import subprocess
 from itertools import chain
-#from sympy import Symbol, diff, sin
 
 # Function to fit:
 def func(X, a0, a1, a2, a3, a4, a5):
      x, y = X
      return a0 + a1*y + a2*x + a3*y**2 + a4*x**2  + a5*x*y 
 
-# Load data:
-y_data, z_data, x_data  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_I_over_17_volumes/solid_1__xyz_sorted_as_P_wise.dat').T
+# Load the raw T, P, G data: 17 volumes calcite I and 4 volumes calcite II, for instance:
+y_data, z_data, x_data  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_I_over_17_volumes/SHRINK_3_3/crystal17_Pcrystal/volumes/grabbing_exact_value_of_freqs/solid_1__xyz_sorted_as_P_wise.dat').T
 
-y_data_2, z_data_2, x_data_2  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_II_correct_description/solid_1__xyz_sorted_as_P_wise.dat').T
+y_data_2, z_data_2, x_data_2  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_II_correct_description/scelphono_121_1-21_210__SHRINK_3_3/new/solid_1__xyz_sorted_as_P_wise.dat').T
 
 # Calling non linear curve_fit
 popt, pcov = curve_fit(func, (x_data, y_data), z_data) 
@@ -82,16 +81,20 @@ G_I  (T, P) = G_II (T, P)
 
 """
 # Set the boundaries of T here:
-x_mesh = np.linspace(10.0000000000000, 2000.0000000000000, 20)
-x_mesh_2 = np.linspace(10.0000000000000, 2000.0000000000000, 20)
+x_mesh = np.linspace(x_data[0], x_data[-1], 20)
+x_mesh_2 = np.linspace(x_data_2[0], x_data_2[-1], 20)
 print x_mesh[0]
 print x_mesh[-1]
 
+print 'y_data[0] = ', y_data[0] 
+print 'y_data[-1] = ', y_data[-1] 
+
+print 'y_data_2[0] = ', y_data_2[0] 
+print 'y_data_2[-1] = ', y_data_2[-1] 
+
 # Set the boundaries for P here:
-#y_mesh = np.linspace(-4.4121040129800, 10.8555489379000, 20) # before cleaning QHA script
-y_mesh = np.linspace(-4.4119598462100, 10.8557347078000, 20)
-#y_mesh_2 = np.linspace(8.0622039627300, 17.6458151433000, 20) # before cleaning QHA script
-y_mesh_2 = np.linspace(7.5789845745700, 17.2263775726000, 20)
+y_mesh = np.linspace(y_data[0], y_data[-1], 20)
+y_mesh_2 = np.linspace(y_data_2[0], y_data_2[-1], 20)
 print y_mesh[0]
 print y_mesh[-1]
 
@@ -100,7 +103,6 @@ xx_2, yy_2 = np.meshgrid(x_mesh_2, y_mesh_2)
 
 z_fit = a0 + a1*yy + a2*xx + a3*yy**2 + a4*xx**2  + a5*xx*yy		
 z_fit_2 = a0_s2 + a1_s2*yy_2 + a2_s2*xx_2 + a3_s2*yy_2**2 + a4_s2*xx_2**2  + a5_s2*xx_2*yy_2		
-
 
 ## Solving the intersection:
 print """ 
@@ -141,28 +143,6 @@ sol = sym.solve(z_I(x,y) - z_II(x,y), y)
 print 'sol =', sol
 
 print 'sol[0] = ', sol[0]
-#sys.exit()
-
-# For obtaining the plot of the two branches y=y(x), we need np.sqrt
-
-#def y_sol_1(x):
-#   x = sym.Symbol('x', real=True)
-#   return sol[0] 
-
-#    return 0.000319359080035813*x - 1.22230952828787e-15*np.sqrt(-1.07919313606384e+24*x**2 + 2.00910207755286e+28*x - 1.12101975048632e+30) + 10.6162640815323
-
-
-#def y_sol_2(x):
-#    x = sym.Symbol('x', real=True)
-#    return sol[1] 
- 
-#     return 0.000319359080035813*x + 1.22230952828787e-15*np.sqrt(-1.07919313606384e+24*x**2 + 2.00910207755286e+28*x - 1.12101975048632e+30) + 10.6162640815323
-
-
-
-#print ' y_sol_1(10.0) = ', y_sol_1(10.0+0j)
-#print ' y_sol_2(10.0) = ', y_sol_2(10.0+0j)
-
 
 cross = sym.solve(sol[0]-sol[1])
 print ' cross = ', cross
@@ -177,24 +157,6 @@ print 'y_sol_1.subs({x:2000.0}) = ', y_sol_1.subs({x:2000.0})
 print 'type(x) = ', type(x)
 y = sym.symbols('y', real=True)
 print 'type(x) = ', type(x)
-
-#sys.exit()
-### Obtaining some values ####
-#print 'Obtaining some values #############' 
-#print ' y_sol_1(2000.0) = ', y_sol_1(2000.0)
-#print ' y_sol_2(2000.0) = ', y_sol_2(2000.0)
-#print 'z_I(x=2000.0 K , y=4.05017007106 GPa) = ', z_I(2000.0,4.05017007106)
-#print 'z_II(x=2000.0 K , y=4.05017007106 GPa) = ', z_II(2000.0,4.05017007106)
-#print 'abs [z_II(x=2000.0 K , y=4.05017007106 GPa)  - z_I(x=2000.0 K , y=4.05017007106 GPa)] = ', abs(z_II(2000.0,4.05017007106) - z_I(2000.0,4.05017007106))
-#print """
-#
-#"""
-#print 'z_I(x=2000.0 K , y=18.4597944121 GPa) = ', z_I(2000.0,18.4597944121)
-#print 'z_II(x=2000.0 K , y=18.4597944121 GPa) = ', z_II(2000.0,18.4597944121)
-#print 'abs [z_II(x=2000.0 K , y=18.4597944121 GPa)  - z_I(x=2000.0 K , y=18.4597944121 GPa)] = ', abs(z_II(2000.0,18.4597944121) - z_I(2000.0, 18.4597944121))
-#
-
-#sys.exit()
 
 ##### Plotting:
 # Use this to turn on matplotlib 1.5 defaults:
@@ -215,8 +177,6 @@ ax.plot_surface(xx_2, yy_2, z_fit_2, color='g', alpha=0.5)
 
 # Plot the initial scattered points
 ax.scatter(x_data, y_data, z_data, color='r', marker='o') # 'ro') #color='r', marker='o')
-#ax.scatter(x_data_2, y_data_2, z_data_2, '^s') # original. Doing '^s' is the same as:
-#ax.scatter(x_data_2, y_data_2, z_data_2,) 
 ax.scatter(x_data_2, y_data_2, z_data_2, color='b', marker='o' ) #, '^') 
 
 
@@ -231,23 +191,13 @@ ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
-
-# Plot the original function
-#ax.plot_surface(xx, yy, z_fit, color='y', alpha=0.5)
-
 # Plot the initial scattered points
 ax.scatter(x_data, y_data, z_data, color='r', marker='o') # 'ro') #color='r', marker='o')
-
 
 ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
 ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 ax.set_title('\n\nCalcite I', linespacing=3)
-#plt.xticks(x, labels, rotation='vertical')
 xlabels=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
 ax.set_xticklabels(xlabels,rotation=90,
                   verticalalignment='baseline',#)#,
@@ -258,16 +208,7 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.tight_layout()
-#bbox = fig.bbox_inches.from_bounds(1, 1, 1, 1)
-#fig.subplots_adjust(left=0.55,bottom=None, right=None, top=None,wspace=None, hspace=None)
-#plt.show()
-#sys.exit()
-#fig.tight_layout()
 fig.savefig("Calcite_I_scattered.pdf",  bbox_inches='tight', pad_inches=0.3)#, tight_layout() )#, bbox_inches=bbox)
-
-
-
 
 ###### Calcite I surface ########
 # In a new figure, each surface separately:
@@ -275,23 +216,16 @@ fig.savefig("Calcite_I_scattered.pdf",  bbox_inches='tight', pad_inches=0.3)#, t
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
-
 # Plot the original function
 ax.plot_surface(xx, yy, z_fit, color='y', alpha=0.5)
 
 # Plot the initial scattered points
 ax.scatter(x_data, y_data, z_data, color='r', marker='o') # 'ro') #color='r', marker='o')
 
-
 ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
 ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 ax.set_title('\n\nCalcite I', linespacing=3)
-#plt.xticks(x, labels, rotation='vertical')
 xlabels=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
 ax.set_xticklabels(xlabels,rotation=90,
                   verticalalignment='baseline',#)#,
@@ -302,9 +236,6 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.tight_layout()
-#bbox = fig.bbox_inches.from_bounds(1, 1, 1, 1)
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_I.pdf" )#, bbox_inches=bbox)
 
 ######  Calcite II scattered ###########
@@ -313,17 +244,8 @@ fig.savefig("Calcite_I.pdf" )#, bbox_inches=bbox)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
-
-# Plot the original function
-#ax.plot_surface(xx_2, yy_2, z_fit_2, color='g', alpha=0.5)
-
 # Plot the initial scattered points
 ax.scatter(x_data_2, y_data_2, z_data_2, '^s') #color='r', marker='o')
-
 
 ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
@@ -340,24 +262,13 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.tight_layout()
-#bbox = fig.bbox_inches.from_bounds(1, 1, 1, 1)
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_II_scattered.pdf" )#, bbox_inches=bbox)
-
-
-
 
 ######  Calcite II surface ###########
 # In a new figure, each surface separately:
 # set "fig" and "ax" varaibles
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
 
 # Plot the original function
 ax.plot_surface(xx_2, yy_2, z_fit_2, color='g', alpha=0.5)
@@ -381,22 +292,13 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.tight_layout()
-#bbox = fig.bbox_inches.from_bounds(1, 1, 1, 1)
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_II.pdf" )#, bbox_inches=bbox)
-
 
 ###### Calcite I and II surfaces ########
 # In a new figure, each surface separately:
 # set "fig" and "ax" varaibles
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
 
 # Plot the original function
 ax.plot_surface(xx, yy, z_fit, color='y', alpha=0.5)
@@ -414,7 +316,6 @@ ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
 ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 ax.set_title('\n\nCalcite I and II', linespacing=3)
-#plt.xticks(x, labels, rotation='vertical')
 xlabels=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
 ax.set_xticklabels(xlabels,rotation=90,
                   verticalalignment='baseline',#)#,
@@ -425,7 +326,6 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_I_and_II.pdf" )#, bbox_inches=bbox)
 
 
@@ -435,11 +335,6 @@ fig.savefig("Calcite_I_and_II.pdf" )#, bbox_inches=bbox)
 # set "fig" and "ax" varaibles
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
 
 # Plot the original function
 ax.plot_surface(xx, yy, z_fit, color='y', alpha=0.9) #, opacity=0.9)
@@ -457,7 +352,6 @@ ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
 ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 ax.set_title('\n\nCalcite I and II', linespacing=3)
-#plt.xticks(x, labels, rotation='vertical')
 xlabels=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
 ax.set_xticklabels(xlabels,rotation=90,
                   verticalalignment='baseline',#)#,
@@ -468,7 +362,6 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_I_and_II_opaque.pdf" )#, bbox_inches=bbox)
 
 
@@ -478,19 +371,8 @@ fig.savefig("Calcite_I_and_II_opaque.pdf" )#, bbox_inches=bbox)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-# If you set "classic", use also this, 
-# in order to capture z-labels right:
-#z_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
-#ax.zaxis.set_major_formatter(z_formatter)
-
-# Plot the original function
-#ax.plot_surface(xx, yy, z_fit, color='y', alpha=0.5)
-
 # Plot the initial scattered points
 ax.scatter(x_data, y_data, z_data, color='r', marker='o') # 'ro') #color='r', marker='o')
-
-# Plot the original function
-#ax.plot_surface(xx_2, yy_2, z_fit_2, color='g', alpha=0.5)
 
 # Plot the initial scattered points
 ax.scatter(x_data_2, y_data_2, z_data_2, '^s') #color='r', marker='o')
@@ -499,7 +381,6 @@ ax.set_xlabel('\nT (K)')
 ax.set_ylabel('P (GPa)')
 ax.set_zlabel('\nGibbs free energy / F.unit (a.u.)', linespacing=3)
 ax.set_title('\n\nCalcite I and II', linespacing=3)
-#plt.xticks(x, labels, rotation='vertical')
 xlabels=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
 ax.set_xticklabels(xlabels,rotation=90,
                   verticalalignment='baseline',#)#,
@@ -510,7 +391,6 @@ ax.set_yticklabels(ylabels,rotation=0,
                   verticalalignment='baseline')#,
 #                 horizontalalignment='left')
 
-#fig.subplots_adjust(left=0,right=1,bottom=0,top=1)
 fig.savefig("Calcite_I_and_II_scattered.pdf" )#, bbox_inches=bbox)
 
 
@@ -525,10 +405,8 @@ y_vals_sol_1 = lam_y_sol_1(x_vals)
 y_vals_sol_2 = lam_y_sol_2(x_vals)
 
 plt.plot(x_vals, y_vals_sol_1, "fuchsia")
-#plt.plot(x, sol[0], "fuchsia")
 plt.plot(x_vals, y_vals_sol_2, "black")
 
-#plt.plot(x, sol[1], "black")
 plt.xlabel('T (K)')
 plt.ylabel('P (GPa)')
 plt.title('Exact expression of P=P(T)\nas a result of making $G^{I}(T,P)=G^{II}(T,P)$')
@@ -536,9 +414,6 @@ tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
 plt.xticks(tics_shown)
 plt.grid()
 fig.savefig("two_solutions.pdf",  bbox_inches='tight' )
-#plt.show()
-
-
 
 # New figure for the y=y(x) function in circle:
 fig = plt.figure()
@@ -553,20 +428,10 @@ plt.plot(x_vals_circle, y_vals_sol_2_circle, "black")
 plt.xlabel('T (K)')
 plt.ylabel('P (GPa)')
 plt.title('Exact expression of P=P(T)\nas a result of making $G^{I}(T,P)=G^{II}(T,P)$')
-#tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
-#plt.xticks(tics_shown)
 plt.grid()
 fig.savefig("circle_2_solutions_T_1e4_points.pdf",  bbox_inches='tight' )
 
 
-# New figure for the G1(T,P)-G2(T,P) vs P at a fixed T:
-#fig = plt.figure()
-#plt.plot(press,diff)
-#plt.xlabel('P (GPa)')
-#plt.ylabel('$G^{I}(T,P) - G^{II}(T,P)$ / F.unit  (a.u.)')
-#plt.title('At T={fixed_T}K'.format(fixed_T=fixed_T))
-#plt.grid()
-#
 print 'Performing the collisions program....'
 
 # PERFORMING THE MATCHES with the 100 volumes::
@@ -575,15 +440,10 @@ print 'Performing the collisions program....'
 # y -> P
 # z -> G
 
-V1, y1, x1, z1  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_I_over_17_volumes/USING_100_VOLUMES/Vs_Ps_Gs.dat').T
-#y_data, z_data, x_data  = np.loadtxt('./solid_1__xyz_sorted_as_P_wise.dat').T
+# Load the interpolated T, P, G data: 100 data points, for instance:
+V1, y1, x1, z1  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_I_over_17_volumes/SHRINK_3_3/crystal17_Pcrystal/volumes/grabbing_exact_value_of_freqs/USING_100_VOLUMES/Vs_Ps_Gs.dat').T
 
-V2, y2, x2, z2  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_II_correct_description_removing_neg_freqs/USING_100_VOLUMES/Vs_Ps_Gs.dat').T
-#y_data_2, z_data_2, x_data_2  = np.loadtxt('./solid_2__xyz_sorted_as_P_wise.dat').T
-
-
-#print 'len(z_1) =', len(z_1)
-#print 'len(z_2) =', len(z_2)
+V2, y2, x2, z2  = np.loadtxt('/home/david/Trabajo/structures/SCRIPT_ON_ALL_THE_PHASES/Calcite_II_correct_description/scelphono_121_1-21_210__SHRINK_3_3/new/USING_100_VOLUMES/Vs_Ps_Gs.dat').T
 
 
 def within_tolerance(p1, p2):
@@ -611,18 +471,8 @@ for p2 in points_2:
     matches = [p1 for p1 in points_1 if within_tolerance(p1, p2)]
     collisions_1.append(matches)
 
-#output_array_1 = np.vstack((collisions_1))
-#np.savetxt('collisions_1.dat', output_array_1, header="T(K)P(GPa)G/F unit (a.u)", fmt="%0.14f")
-
 print 'collisions_1 = ', collisions_1
-
 print 'collisions_2 = ', collisions_2
-
-#for i in chain.from_iterable(collisions_1):
-#   print 'collisions in calcite 1 = ', i
-
-#for i in chain.from_iterable(collisions_2):
-#   print 'collisions in calcite 2 = ',  i
 
 collisions_1 = [i for i in chain.from_iterable(collisions_1)]
 print  'collisions in calcite 1 = ', collisions_1 
@@ -643,7 +493,6 @@ T2, P2, G2  = np.loadtxt('./collisions_2.dat').T
 
 
 # Quadratic fit of T=T(P):
-#c, d, f = np.polyfit(P1, T1, 2)
 fitting = np.polyfit(P1, T1, 1)
 fit = np.poly1d(fitting)
 
@@ -706,20 +555,16 @@ x_vals_m = np.linspace(10.0, 2000.0, 100)
 
 y_vals_sol_1_m = lam_y_sol_1(x_vals_m)
 y_vals_sol_2_m = lam_y_sol_2(x_vals_m)
+print 'y_vals_sol_1_m = ', y_vals_sol_1_m
+print 'y_vals_sol_2_m = ', y_vals_sol_2_m
 
-#plt.plot(x_vals_m, y_vals_sol_1_m, "fuchsia")
 plt.plot(y_vals_sol_1_m, x_vals_m, "fuchsia")
-#plt.plot(x_vals_m, y_vals_sol_2_m, "black")
 plt.plot(y_vals_sol_2_m, x_vals_m, "black")
 
-#plt.xlabel('T (K)')
 plt.ylabel('T (K)')
-#plt.ylabel('P (GPa)')
 plt.xlabel('P (GPa)')
 
-#plt.scatter(T1, P1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P1, T1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
-#plt.scatter(T2, P2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P2, T2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
 plt.grid()
@@ -737,34 +582,29 @@ fit = np.poly1d(fitting)
 fig = plt.figure()
 x_vals_m = np.linspace(10.0, 2000.0, 100)
 
-xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+#xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+xp = np.linspace(min(P1), max(P1), 100)
 
 y_vals_sol_1_m = lam_y_sol_1(x_vals_m)
 y_vals_sol_2_m = lam_y_sol_2(x_vals_m)
 
-#plt.plot(x_vals_m, y_vals_sol_1_m, "fuchsia")
 plt.plot(y_vals_sol_1_m, x_vals_m, "fuchsia") #, label='\nSolutions for the quadratic fit')
-#plt.plot(x_vals_m, y_vals_sol_2_m, "black")
 plt.plot(y_vals_sol_2_m, x_vals_m, "black") #, label='\n')
 
 # The fit for the collisions:
 plt.plot(xp, fit(xp), "green")
 
-#plt.xlabel('T (K)')
 plt.ylabel('T (K)')
-#plt.ylabel('P (GPa)')
 plt.xlabel('P (GPa)')
 
-#plt.scatter(T1, P1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P1, T1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
-#plt.scatter(T2, P2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P2, T2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
 plt.grid()
 
 plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
                 mode="expand", borderaxespad=0, ncol=4)
-
+#plt.ylim(, )  # If you want to limit the x-axis
 fig.savefig("Matching_1_and_2_on_G_T_and_P_T_vs_P_fit_1st_degree.pdf",  bbox_inches='tight', pad_inches=0.3)#, tight_layout() )#, bbox_inches=bbox)
 
 
@@ -775,27 +615,22 @@ fit = np.poly1d(fitting)
 fig = plt.figure()
 x_vals_m = np.linspace(10.0, 2000.0, 100)
 
-xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+#xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+xp = np.linspace(min(P1), max(P1), 100)
 
 y_vals_sol_1_m = lam_y_sol_1(x_vals_m)
 y_vals_sol_2_m = lam_y_sol_2(x_vals_m)
 
-#plt.plot(x_vals_m, y_vals_sol_1_m, "fuchsia")
 plt.plot(y_vals_sol_1_m, x_vals_m, "fuchsia")
-#plt.plot(x_vals_m, y_vals_sol_2_m, "black")
 plt.plot(y_vals_sol_2_m, x_vals_m, "black")
 
 # The fit for the collisions:
 plt.plot(xp, fit(xp), "green")
 
-#plt.xlabel('T (K)')
 plt.ylabel('T (K)')
-#plt.ylabel('P (GPa)')
 plt.xlabel('P (GPa)')
 
-#plt.scatter(T1, P1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P1, T1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
-#plt.scatter(T2, P2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P2, T2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
 plt.grid()
@@ -813,27 +648,22 @@ fit = np.poly1d(fitting)
 fig = plt.figure()
 x_vals_m = np.linspace(10.0, 2000.0, 100)
 
-xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+#xp = np.linspace(7.6478503874853, 10.7114925964187, 100)
+xp = np.linspace(min(P1), max(P1), 100)
 
 y_vals_sol_1_m = lam_y_sol_1(x_vals_m)
 y_vals_sol_2_m = lam_y_sol_2(x_vals_m)
 
-#plt.plot(x_vals_m, y_vals_sol_1_m, "fuchsia")
 plt.plot(y_vals_sol_1_m, x_vals_m, "fuchsia")
-#plt.plot(x_vals_m, y_vals_sol_2_m, "black")
 plt.plot(y_vals_sol_2_m, x_vals_m, "black")
 
 # The fit for the collisions:
 plt.plot(xp, fit(xp), "green")
 
-#plt.xlabel('T (K)')
 plt.ylabel('T (K)')
-#plt.ylabel('P (GPa)')
 plt.xlabel('P (GPa)')
 
-#plt.scatter(T1, P1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P1, T1, color='r', marker='o', label='Calcite I (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
-#plt.scatter(T2, P2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 plt.scatter(P2, T2, color='b', marker='o', label='Calcite II (P,T) data \nfor which $G^{I}, T^{I}, P^{I} = G^{II}, T^{II}, P^{II}$')
 tics_shown =  [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250]
 plt.grid()
@@ -843,16 +673,7 @@ plt.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left",
 
 fig.savefig("Matching_1_and_2_on_G_T_and_P_T_vs_P_fit_3rd_degree.pdf",  bbox_inches='tight', pad_inches=0.3)#, tight_layout() )#, bbox_inches=bbox)
 
-
-
-
-#plt.legend()
 subprocess.call("./trimming.sh", shell=True)
 
 plt.show()
-
-
-
-
-
 
