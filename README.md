@@ -21,7 +21,7 @@ Or, is also valid `sym.Symbol`:
 ```
 x = sym.Symbol('x')
 ```
-If therre are only complex solutions, the 
+If there are only complex solutions, the 
 
 ```P = sym.Symbol('P', real=True)```
 
