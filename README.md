@@ -21,3 +21,8 @@ Or, is also valid `sym.Symbol`:
 ```
 x = sym.Symbol('x')
 ```
+If therre are only complex solutions, the 
+
+```P = sym.Symbol('P', real=True)```
+
+will not return anything, since we are asking to return always a real solution.
